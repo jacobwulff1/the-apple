@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE APPLE • A Digital Study</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&amp;family=Playfair+Display:wght@700&amp;display=swap');
+        
+        :root {
+            --apple-red: #c8102e;
+        }
+        
+        body {
+            font-family: 'Instrument Sans', system_ui, sans-serif;
+        }
+        
+        .heading-serif {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .apple-container {
+            filter: drop-shadow(0 25px 25px rgb(0 0 0 / 0.15));
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                       filter 0.3s ease;
+        }
+
+        .apple-container:hover {
+            transform: translateY(-8px) scale(1.01);
+            filter: drop-shadow(0 35px 35px rgb(0 0 0 / 0.18));
+        }
+
+        .apple-svg {
+            transition: transform 0.2s ease;
+        }
+
+        .apple-svg.bitten {
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-4px); }
+            40%, 80% { transform: translateX(4px); }
+        }
+
+        .section-header {
+            font-size: 2.25rem;
+            line-height: 1.1;
+            letter-spacing: -0.04em;
+        }
+
+        .fact-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .fact-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+        }
+
+        .swatch {
+            width: 42px;
+            height: 42px;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1), 
+                       inset 0 1px 0 rgba(255,255,255,0.4);
+        }
+        
+        .swatch:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        
+        .swatch.active {
+            box-shadow: 0 0 0 3px white, 0 0 0 5px #c8102e;
+            transform: scale(1.05);
+        }
+
+        .nav-link {
+            position: relative;
+            transition: color 0.1s ease;
+        }
+        
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1.5px;
+            bottom: -2px;
+            left: 0;
+            background-color: #c8102e;
+            transition: width 0.2s ease;
+        }
+        
+        .nav-link:hover:after {
+            width: 100%;
+        }
+
+        .stat-number {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .bite-progress {
+            transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .crunch-particle {
+            position: absolute;
+            font-size: 13px;
+            font-weight: 600;
+            color: #854d0e;
+            pointer-events: none;
+            animation: crunch-pop 0.6s ease forwards;
+            z-index: 10;
+        }
+
+        @keyframes crunch-pop {
+            0% {
+                transform: translateY(0) scale(0.6);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-38px) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .premium-shadow {
+            box-shadow: 0 10px 10px -3px rgb(0 0 0 / 0.1),
+                       0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-200">
+    <!-- NAV -->
+    <nav class="border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-lg sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center gap-x-3">
+                    <div class="w-9 h-9 rounded-2xl bg-red-600 flex items-center justify-center">
+                        <i class="fa-solid fa-apple-alt text-white text-3xl"></i>
+                    </div>
+                    <div>
+                        <span class="font-semibold tracking-tighter text-3xl">THE APPLE</span>
+                    </div>
+                </div>
+                
+                <div class="hidden md:flex items-center gap-x-9 text-sm font-medium">
+                    <a href="#story" class="nav-link text-zinc-400 hover:text-zinc-200">The Story</a>
+                    <a href="#interact" class="nav-link text-zinc-400 hover:text-zinc-200">Interact</a>
+                    <a href="#facts" class="nav-link text-zinc-400 hover:text-zinc-200">By the Numbers</a>
+                </div>
+                
+                <div class="flex items-center gap-x-3">
+                    <button onclick="resetApple()"
+                            class="px-5 py-2 text-sm font-medium rounded-3xl border border-zinc-800 hover:bg-zinc-900 transition-colors flex items-center gap-x-2">
+                        <i class="fa-solid fa-undo text-xs"></i>
+                        <span class="hidden sm:inline">Reset</span>
+                    </button>
+                    <button onclick="shareApple()"
+                            class="px-6 py-2 text-sm font-semibold rounded-3xl bg-white text-zinc-950 hover:bg-zinc-100 transition-colors flex items-center gap-x-2">
+                        <i class="fa-solid fa-share-alt text-xs"></i>
+                        <span>Share</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <div class="max-w-6xl mx-auto px-8 pt-16 pb-12">
+        <div class="flex flex-col items-center text-center">
+            <div class="inline-flex items-center gap-x-2 px-4 py-1.5 rounded-3xl bg-zinc-900 border border-zinc-800 mb-6">
+                <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                <span class="text-xs font-medium tracking-[1.5px] text-emerald-400">NATURE'S PERFECT OBJECT</span>
+            </div>
+            
+            <h1 class="heading-serif text-7xl md:text-8xl tracking-tighter leading-none mb-4">
+                THE APPLE
+            </h1>
+            <p class="max-w-md text-xl text-zinc-400">
+                Timeless. Crisp. Irresistible.<br>
+                A study in simple perfection.
+            </p>
+            
+            <div class="flex items-center gap-x-4 mt-8">
+                <button onclick="document.getElementById('interact').scrollIntoView({ behavior: 'smooth' })" 
+                        class="px-8 py-4 rounded-3xl bg-red-600 hover:bg-red-700 transition-all font-semibold flex items-center gap-x-3 text-lg group">
+                    <span>Interact with it</span>
+                    <i class="fa-solid fa-arrow-right transition-transform group-hover:translate-x-0.5"></i>
+                </button>
+                <button onclick="document.getElementById('facts').scrollIntoView({ behavior: 'smooth' })" 
+                        class="px-7 py-4 rounded-3xl border border-zinc-700 hover:bg-zinc-900 transition-colors font-medium">
+                    Learn more
+                </button>
+            </div>
+            
+            <div class="mt-12 text-[10px] tracking-[2px] text-zinc-500 flex items-center gap-x-5">
+                <div>EST. 4000 BCE</div>
+                <div class="w-px h-2.5 bg-zinc-700"></div>
+                <div>7,500+ VARIETIES</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INTERACTIVE APPLE -->
+    <div id="interact" class="max-w-6xl mx-auto px-8 pb-20">
+        <div class="grid md:grid-cols-12 gap-8 items-start">
+            
+            <!-- APPLE VISUAL -->
+            <div class="md:col-span-7 flex justify-center">
+                <div class="apple-container relative" id="apple-wrapper">
+                    <svg id="apple-svg" width="340" height="400" viewBox="0 0 340 400" class="apple-svg drop-shadow-2xl">
+                        <!-- Shadow -->
+                        <ellipse cx="170" cy="345" rx="98" ry="22" fill="#000000" opacity="0.18"/>
+                        
+                        <!-- Main Body -->
+                        <ellipse id="apple-body" cx="170" cy="215" rx="115" ry="138" fill="#c8102e"/>
+                        
+                        <!-- Subtle shading / form -->
+                        <ellipse cx="170" cy="215" rx="115" ry="138" fill="#9f0e24" opacity="0.15"/>
+                        
+                        <!-- Highlight / gloss -->
+                        <ellipse cx="125" cy="145" rx="52" ry="68" fill="#ffffff" opacity="0.22"/>
+                        <ellipse cx="125" cy="145" rx="38" ry="48" fill="#ffffff" opacity="0.15"/>
+                        
+                        <!-- Stem -->
+                        <path id="stem" d="M170 82 Q182 58 168 42" stroke="#5c4033" stroke-width="11" stroke-linecap="round" fill="none"/>
+                        <path d="M170 82 Q178 62 165 48" stroke="#3f2a22" stroke-width="5" stroke-linecap="round" fill="none"/>
+                        
+                        <!-- Leaf -->
+                        <path id="leaf" d="M165 55 Q205 32 225 58 Q202 82 165 68" fill="#15803d"/>
+                        <path id="leaf-vein" d="M168 58 Q195 48 210 62" stroke="#166534" stroke-width="2.5" fill="none"/>
+                        
+                        <!-- Subtle surface texture lines -->
+                        <path d="M85 180 Q120 195 155 178" stroke="#9f0e24" stroke-width="1.5" opacity="0.3" fill="none"/>
+                        <path d="M95 230 Q130 245 165 225" stroke="#9f0e24" stroke-width="1.5" opacity="0.25" fill="none"/>
+                        <path d="M255 195 Q220 210 185 190" stroke="#9f0e24" stroke-width="1.5" opacity="0.3" fill="none"/>
+                        
+                        <!-- Bite marks (revealed progressively) -->
+                        <g id="bite-marks" opacity="0.9">
+                            <!-- Bite 1 -->
+                            <path id="bite-1" d="M215 175 Q235 195 228 225 Q205 215 210 185 Z" fill="#c8102e" opacity="0"/>
+                            <!-- Bite 2 -->
+                            <path id="bite-2" d="M135 260 Q155 285 142 310 Q120 295 128 265 Z" fill="#c8102e" opacity="0"/>
+                            <!-- Bite 3 -->
+                            <path id="bite-3" d="M195 280 Q220 305 205 335 Q178 315 185 285 Z" fill="#c8102e" opacity="0"/>
+                        </g>
+                    </svg>
+                    
+                    <!-- Status overlay -->
+                    <div id="apple-status" 
+                         class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-zinc-900 border border-zinc-800 text-xs font-mono px-4 py-1 rounded-3xl flex items-center gap-x-2">
+                        <div class="flex items-center gap-x-1.5">
+                            <i class="fa-solid fa-seedling text-emerald-400"></i>
+                            <span id="status-text" class="font-medium tracking-tight">PRISTINE • FRESH</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CONTROLS -->
+            <div class="md:col-span-5 pt-4 md:pt-8">
+                <div class="mb-8">
+                    <div class="uppercase tracking-[2px] text-xs font-semibold text-red-500 mb-2">EXPERIENCE IT</div>
+                    <h2 class="heading-serif text-5xl tracking-tighter leading-none">Design your apple.</h2>
+                    <p class="mt-3 text-zinc-400">Change its color. Take a bite. Watch it evolve.</p>
+                </div>
+                
+                <!-- Color Picker -->
+                <div class="mb-8">
+                    <div class="text-xs uppercase tracking-widest text-zinc-500 mb-3 px-1">SKIN COLOR</div>
+                    <div class="flex flex-wrap gap-3">
+                        <div onclick="changeAppleColor('#c8102e', this)" class="swatch active border border-white/30" style="background-color: #c8102e;" data-color="#c8102e"></div>
+                        <div onclick="changeAppleColor('#15803d', this)" class="swatch border border-white/30" style="background-color: #15803d;" data-color="#15803d"></div>
+                        <div onclick="changeAppleColor('#ca8a04', this)" class="swatch border border-white/30" style="background-color: #ca8a04;" data-color="#ca8a04"></div>
+                        <div onclick="changeAppleColor('#e11d48', this)" class="swatch border border-white/30" style="background-color: #e11d48;" data-color="#e11d48"></div>
+                        <div onclick="changeAppleColor('#854d0e', this)" class="swatch border border-white/30" style="background-color: #854d0e;" data-color="#854d0e"></div>
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="space-y-3">
+                    <button onclick="takeBite()" 
+                            class="w-full group flex items-center justify-between px-7 h-14 rounded-3xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 transition-all active:scale-[0.985]">
+                        <div class="flex items-center gap-x-3">
+                            <i class="fa-solid fa-bite text-red-400 text-xl group-active:rotate-12 transition-transform"></i>
+                            <span class="font-semibold text-lg">Take a bite</span>
+                        </div>
+                        <div class="text-xs px-3 py-1 rounded-2xl bg-zinc-950 border border-zinc-700 font-mono">CRUNCH</div>
+                    </button>
+                    
+                    <button onclick="polishApple()" 
+                            class="w-full flex items-center justify-center gap-x-2 px-7 h-12 rounded-3xl border border-zinc-700 hover:bg-zinc-900 transition-all text-sm font-medium">
+                        <i class="fa-solid fa-sun text-amber-300"></i>
+                        <span>Polish to a shine</span>
+                    </button>
+                </div>
+                
+                <!-- Progress -->
+                <div class="mt-8 px-1">
+                    <div class="flex justify-between items-baseline mb-2 text-xs">
+                        <div class="font-medium text-zinc-400">FRESHNESS</div>
+                        <div id="bite-count" class="font-mono text-red-400 tabular-nums">0 / 5 bites</div>
+                    </div>
+                    <div class="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                        <div id="freshness-bar" class="bite-progress h-1.5 bg-gradient-to-r from-red-500 to-rose-400 w-[100%]" 
+                             style="width: 100%"></div>
+                    </div>
+                    <div id="freshness-label" class="text-[10px] text-emerald-400 mt-1.5 tracking-tight">Still perfectly crisp</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- THE STORY -->
+    <div id="story" class="border-t border-zinc-900 bg-zinc-900/40">
+        <div class="max-w-3xl mx-auto px-8 py-20">
+            <div class="max-w-xl">
+                <div class="uppercase text-red-500 text-xs tracking-[3px] font-semibold mb-3">ORIGIN STORY</div>
+                <h2 class="heading-serif text-6xl tracking-tighter leading-none mb-6">A simple miracle.</h2>
+                
+                <div class="prose prose-invert text-zinc-300 text-[15px] leading-relaxed">
+                    <p>The apple is one of humanity’s oldest cultivated fruits. From the wild crabapples of Central Asia to the orchards of ancient Rome and the modern groves of Washington state, it has traveled with us for millennia.</p>
+                    <p class="mt-4">Its perfect geometry, satisfying crunch, and balanced sweet-tart flavor make it a universal symbol of knowledge, health, and temptation. No other fruit feels quite so complete in the hand.</p>
+                </div>
+                
+                <div class="mt-8 flex items-center gap-x-4 text-sm">
+                    <div class="flex -space-x-1">
+                        <div class="w-6 h-6 bg-red-600 rounded-full border border-zinc-800"></div>
+                        <div class="w-6 h-6 bg-emerald-700 rounded-full border border-zinc-800"></div>
+                        <div class="w-6 h-6 bg-yellow-600 rounded-full border border-zinc-800"></div>
+                    </div>
+                    <span class="text-xs text-zinc-400">One fruit. Infinite expressions.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FACTS -->
+    <div id="facts" class="max-w-6xl mx-auto px-8 py-16">
+        <div class="flex justify-between items-end mb-8">
+            <div>
+                <div class="text-red-500 text-xs tracking-[2.5px] font-semibold">QUANTIFIED WONDER</div>
+                <h3 class="heading-serif text-5xl tracking-tighter">By the numbers</h3>
+            </div>
+            <button onclick="showRandomFact()" 
+                    class="hidden md:flex items-center text-sm px-5 h-10 rounded-3xl border border-zinc-700 hover:bg-zinc-900 transition-colors">
+                <span>Surprise fact</span>
+            </button>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-4">
+            <!-- Fact 1 -->
+            <div class="fact-card bg-zinc-900 border border-zinc-800 rounded-3xl p-7">
+                <div class="text-5xl font-semibold tabular-nums tracking-tighter text-red-500">7,500+</div>
+                <div class="mt-1 font-medium">Known varieties</div>
+                <div class="text-sm text-zinc-400 mt-4">From Honeycrisp to Pink Lady, Fuji to Granny Smith. Each with its own personality and season.</div>
+            </div>
+            
+            <div class="fact-card bg-zinc-900 border border-zinc-800 rounded-3xl p-7">
+                <div class="text-5xl font-semibold tabular-nums tracking-tighter text-red-500">25%</div>
+                <div class="mt-1 font-medium">of global apple production</div>
+                <div class="text-sm text-zinc-400 mt-4">Comes from China. The United States follows at roughly 6%.</div>
+            </div>
+            
+            <div class="fact-card bg-zinc-900 border border-zinc-800 rounded-3xl p-7">
+                <div class="text-5xl font-semibold tabular-nums tracking-tighter text-red-500">4</div>
+                <div class="mt-1 font-medium">months average storage</div>
+                <div class="text-sm text-zinc-400 mt-4">Modern controlled atmosphere storage lets apples stay fresh nearly year-round without losing crunch.</div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-8">
+            <button onclick="showRandomFact()" 
+                    class="md:hidden text-sm px-6 py-3 rounded-3xl border border-zinc-700 hover:bg-zinc-900 transition-colors flex items-center gap-x-2 mx-auto">
+                <i class="fa-solid fa-dice"></i>
+                <span>Show a random fact</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-zinc-900 py-8">
+        <div class="max-w-6xl mx-auto px-8 flex flex-col md:flex-row items-center justify-between gap-y-3 text-xs text-zinc-500">
+            <div>Handcrafted as a digital tribute to the apple • 2026</div>
+            <div class="flex items-center gap-x-5">
+                <div>Crispness preserved in code</div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Tailwind script
+        function initTailwind() {
+            document.documentElement.style.setProperty('--accent', '#c8102e');
+        }
+        
+        // State
+        let biteCount = 0;
+        let currentColor = '#c8102e';
+        let isPolished = false;
+        
+        // Change apple color
+        function changeAppleColor(color, element) {
+            const body = document.getElementById('apple-body');
+            if (!body) return;
+            
+            // Remove active from all swatches
+            document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+            if (element) element.classList.add('active');
+            
+            body.setAttribute('fill', color);
+            currentColor = color;
+            
+            // Subtle feedback
+            const wrapper = document.getElementById('apple-wrapper');
+            wrapper.style.transitionDuration = '80ms';
+            wrapper.style.transform = 'scale(0.985)';
+            setTimeout(() => {
+                wrapper.style.transform = 'translateY(-8px) scale(1.01)';
+                setTimeout(() => {
+                    wrapper.style.transitionDuration = '0.4s';
+                }, 120);
+            }, 80);
+        }
+        
+        // Take a bite
+        function takeBite() {
+            if (biteCount >= 5) {
+                showToast("It's just the core now. Plant it?");
+                return;
+            }
+            
+            const svg = document.getElementById('apple-svg');
+            const body = document.getElementById('apple-body');
+            const statusText = document.getElementById('status-text');
+            const freshnessBar = document.getElementById('freshness-bar');
+            const biteCountEl = document.getElementById('bite-count');
+            const freshnessLabel = document.getElementById('freshness-label');
+            
+            biteCount++;
+            
+            // Shake animation
+            svg.classList.add('bitten');
+            setTimeout(() => {
+                svg.classList.remove('bitten');
+            }, 450);
+            
+            // Reveal next bite mark
+            const biteMark = document.getElementById(`bite-${biteCount}`);
+            if (biteMark) {
+                biteMark.setAttribute('opacity', '1');
+                // Make bite slightly darker to simulate depth
+                biteMark.setAttribute('fill', '#9f0e24');
+            }
+            
+            // Update UI
+            biteCountEl.textContent = `${biteCount} / 5 bites`;
+            
+            const remaining = 5 - biteCount;
+            const percent = Math.max(20, (remaining / 5) * 100);
+            freshnessBar.style.width = `${percent}%`;
+            
+            // Dynamic status
+            if (biteCount === 1) {
+                statusText.textContent = 'SLIGHTLY NIBBLED';
+                statusText.style.color = '#f59e0b';
+                freshnessLabel.textContent = 'Still very crisp';
+                freshnessLabel.style.color = '#4ade80';
+            } else if (biteCount === 2) {
+                statusText.textContent = 'ENJOYING THE CRUNCH';
+                statusText.style.color = '#f59e0b';
+                freshnessLabel.textContent = 'Deliciously fresh';
+            } else if (biteCount === 3) {
+                statusText.textContent = 'HALF GONE';
+                statusText.style.color = '#fb923c';
+                freshnessLabel.textContent = 'Getting softer';
+                freshnessLabel.style.color = '#facc15';
+            } else if (biteCount === 4) {
+                statusText.textContent = 'NEARLY FINISHED';
+                statusText.style.color = '#f87171';
+                freshnessLabel.textContent = 'Almost to the core';
+                freshnessLabel.style.color = '#fb923c';
+            } else if (biteCount === 5) {
+                statusText.textContent = 'CORE REVEALED';
+                statusText.style.color = '#b91c1c';
+                freshnessBar.style.background = 'linear-gradient(to right, #854d0e, #713f12)';
+                freshnessLabel.textContent = 'Plant the seeds for next season';
+                freshnessLabel.style.color = '#854d0e';
+                
+                // Desaturate the apple slightly
+                body.setAttribute('fill', '#854d0e');
+                // Wilt the leaf a bit
+                const leaf = document.getElementById('leaf');
+                if (leaf) leaf.setAttribute('fill', '#4d7c0f');
+            }
+            
+            // Spawn crunch particle
+            createCrunchParticle();
+            
+            // If fully eaten
+            if (biteCount === 5) {
+                setTimeout(() => {
+                    showToast("The circle of life continues.");
+                }, 650);
+            }
+        }
+        
+        // Create floating crunch text
+        function createCrunchParticle() {
+            const wrapper = document.getElementById('apple-wrapper');
+            const particle = document.createElement('div');
+            
+            particle.className = 'crunch-particle';
+            particle.textContent = ['CRUNCH', 'CRISP', 'Mmm'][Math.floor(Math.random() * 3)];
+            
+            // Random position around the apple
+            const x = 80 + Math.random() * 160;
+            const y = 120 + Math.random() * 90;
+            
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
+            
+            wrapper.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 650);
+        }
+        
+        // Polish the apple (shine effect)
+        function polishApple() {
+            const body = document.getElementById('apple-body');
+            const wrapper = document.getElementById('apple-wrapper');
+            const statusText = document.getElementById('status-text');
+            
+            if (!body) return;
+            
+            // Quick shine flash
+            const originalFill = body.getAttribute('fill');
+            
+            body.setAttribute('fill', '#f87171');
+            
+            wrapper.style.transitionDuration = '60ms';
+            wrapper.style.transform = 'scale(1.03)';
+            
+            setTimeout(() => {
+                body.setAttribute('fill', currentColor || originalFill);
+                wrapper.style.transform = 'translateY(-8px) scale(1.01)';
+                wrapper.style.transitionDuration = '0.4s';
+                
+                if (!isPolished) {
+                    statusText.textContent = 'POLISHED TO PERFECTION';
+                    statusText.style.color = '#eab308';
+                    isPolished = true;
+                    
+                    setTimeout(() => {
+                        if (biteCount < 3) {
+                            statusText.textContent = biteCount === 0 ? 'PRISTINE • FRESH' : 'SLIGHTLY NIBBLED';
+                            statusText.style.color = biteCount === 0 ? '' : '#f59e0b';
+                            isPolished = false;
+                        }
+                    }, 2200);
+                }
+            }, 280);
+        }
+        
+        // Reset everything
+        function resetApple() {
+            const body = document.getElementById('apple-body');
+            const svg = document.getElementById('apple-svg');
+            const statusText = document.getElementById('status-text');
+            const freshnessBar = document.getElementById('freshness-bar');
+            const biteCountEl = document.getElementById('bite-count');
+            const freshnessLabel = document.getElementById('freshness-label');
+            const leaf = document.getElementById('leaf');
+            
+            biteCount = 0;
+            currentColor = '#c8102e';
+            isPolished = false;
+            
+            // Reset body
+            body.setAttribute('fill', '#c8102e');
+            
+            // Reset leaf
+            if (leaf) leaf.setAttribute('fill', '#15803d');
+            
+            // Hide all bite marks
+            for (let i = 1; i <= 3; i++) {
+                const bite = document.getElementById(`bite-${i}`);
+                if (bite) bite.setAttribute('opacity', '0');
+            }
+            
+            // Reset UI
+            biteCountEl.textContent = `0 / 5 bites`;
+            freshnessBar.style.width = '100%';
+            freshnessBar.style.background = 'linear-gradient(to right, #ef4444, #f43f5e)';
+            statusText.textContent = 'PRISTINE • FRESH';
+            statusText.style.color = '';
+            freshnessLabel.textContent = 'Still perfectly crisp';
+            freshnessLabel.style.color = '#4ade80';
+            
+            // Gentle reset animation
+            svg.style.transitionDuration = '180ms';
+            svg.style.transform = 'scale(0.96)';
+            setTimeout(() => {
+                svg.style.transform = 'scale(1)';
+                svg.style.transitionDuration = '0.2s';
+            }, 180);
+        }
+        
+        // Random fact
+        function showRandomFact() {
+            const facts = [
+                "An apple tree can live over 100 years and produce fruit for most of its life.",
+                "The science of apple growing is called pomology.",
+                "Apples float because 25% of their volume is air.",
+                "It takes the energy from 50 leaves to produce one apple.",
+                "The most popular apple variety in the U.S. is the Gala.",
+                "Apples are a member of the rose family (Rosaceae)."
+            ];
+            
+            const randomFact = facts[Math.floor(Math.random() * facts.length)];
+            
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 max-w-xs bg-zinc-900 border border-zinc-700 text-sm px-6 py-4 rounded-3xl shadow-xl flex items-start gap-x-3 z-[100]`;
+            toast.innerHTML = `
+                <i class="fa-solid fa-lightbulb text-amber-400 mt-0.5"></i>
+                <div>
+                    <div class="font-medium text-amber-300 text-xs tracking-wider mb-px">DID YOU KNOW?</div>
+                    <div class="text-zinc-200">${randomFact}</div>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.transition = 'all 0.2s ease';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 180);
+            }, 5200);
+        }
+        
+        // Share function
+        function shareApple() {
+            const text = "I just spent time with the perfect apple. Crisp, beautiful, and surprisingly interactive. https://theapple.example";
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast("Link copied. Share the crispness.");
+                }).catch(() => {
+                    fallbackShare(text);
+                });
+            } else {
+                fallbackShare(text);
+            }
+        }
+        
+        function fallbackShare(text) {
+            const input = document.createElement('input');
+            input.value = text;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+            showToast("Link copied to clipboard.");
+        }
+        
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 bg-zinc-900 border border-zinc-700 text-sm px-5 py-3 rounded-3xl flex items-center gap-x-2 shadow-2xl z-[100]`;
+            toast.innerHTML = `
+                <span>${message}</span>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.transition = 'all .2s ease';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.parentNode.removeChild(toast), 150);
+            }, 2400);
+        }
+        
+        // Make SVG clickable for bite
+        function makeAppleClickable() {
+            const svg = document.getElementById('apple-svg');
+            if (!svg) return;
+            
+            svg.style.cursor = 'pointer';
+            svg.addEventListener('click', (e) => {
+                // Only bite if clicking roughly on the body
+                const rect = svg.getBoundingClientRect();
+                const clickY = e.clientY - rect.top;
+                
+                if (clickY > 90 && clickY < 320) { // rough body area
+                    takeBite();
+                }
+            });
+            
+            // Subtle hover scale on the wrapper already handled in CSS
+        }
+        
+        // Keyboard support
+        function setupKeyboard() {
+            document.addEventListener('keydown', (e) => {
+                if (e.key === '/' && document.activeElement.tagName === 'BODY') {
+                    e.preventDefault();
+                    document.getElementById('interact').scrollIntoView({ behavior: 'smooth' });
+                }
+                if (e.key.toLowerCase() === 'b' && document.activeElement.tagName === 'BODY') {
+                    e.preventDefault();
+                    takeBite();
+                }
+                if (e.key === 'Escape') {
+                    const openToasts = document.querySelectorAll('.fixed.bottom-6');
+                    if (openToasts.length) openToasts[openToasts.length-1].remove();
+                }
+            });
+            
+            // Easter egg hint
+            console.log('%c[Apple] Press B to bite. Press / to jump to interact section.', 'color:#3f3f46');
+        }
+        
+        // Initialize swatch active state
+        function initSwatches() {
+            const firstSwatch = document.querySelector('.swatch');
+            if (firstSwatch) firstSwatch.classList.add('active');
+        }
+        
+        // Boot everything
+        function initializeWebsite() {
+            initTailwind();
+            initSwatches();
+            makeAppleClickable();
+            setupKeyboard();
+            
+            // Gentle entrance animation for the apple
+            setTimeout(() => {
+                const wrapper = document.getElementById('apple-wrapper');
+                if (wrapper) {
+                    wrapper.style.transitionDuration = '420ms';
+                    wrapper.style.transform = 'translateY(0)';
+                }
+            }, 180);
+            
+            // Random tip after 25 seconds (only once)
+            setTimeout(() => {
+                const status = document.getElementById('status-text');
+                if (status && biteCount === 0 && status.textContent.includes('PRISTINE')) {
+                    // subtle hint
+                    status.style.transitionDuration = '300ms';
+                    status.style.opacity = '0.6';
+                    setTimeout(() => {
+                        if (status) status.style.opacity = '1';
+                    }, 1400);
+                }
+            }, 25000);
+            
+            // Bonus: clicking the logo resets
+            const logo = document.querySelector('.fa-apple-alt');
+            if (logo) {
+                logo.parentElement.style.cursor = 'pointer';
+                logo.parentElement.addEventListener('click', () => {
+                    resetApple();
+                });
+            }
+            
+            console.log('%c[Mythos] Apple website initialized cleanly.', 'color:#44403c');
+        }
+        
+        // Boot on load
+        window.onload = initializeWebsite;
+    </script>
+</body>
+</html>
